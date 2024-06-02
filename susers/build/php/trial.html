@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/susers/build/css/output.css">
+</head>
+<body class="py-2 px-2">
+<input type="text" id="myInput" class="border border-gray-300 px-2 py-1 rounded-md" disabled>
+  
+  <button id="toggleButton" onclick="toggleInput()" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-4">Enable Input</button>
+  
+  <button id="disableButton" onclick="toggleInput()" class="hidden bg-red-500 text-white px-4 py-2 rounded-md mt-4">Disable Input</button>
+
+  <script>
+    function toggleInput() {
+      var input = document.getElementById("myInput");
+      var toggleButton = document.getElementById("toggleButton");
+      var disableButton = document.getElementById("disableButton");
+
+      if (input.disabled) {
+        input.removeAttribute("disabled");
+        toggleButton.classList.add("hidden");
+        disableButton.classList.remove("hidden");
+      } else {
+        input.setAttribute("disabled", "disabled");
+        toggleButton.classList.remove("hidden");
+        disableButton.classList.add("hidden");
+      }
+    }
+  </script>
+
+
+</body>
+<script src="/susers/node_modules/flowbite/dist/flowbite.min.js"></script>
+<script src="/susers/node_modules/flowbite/dist/datepicker.js"></script>
+</html>
