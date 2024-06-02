@@ -1,13 +1,14 @@
 <?php 
+session_start();
 include 'config.php';
-// if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-//    header("Location: /susers/build/php/access/signin/login-admin.php");
-//    exit();
-// }
-// if ($_SESSION['user_type'] !== 'admin') {
-//    header("Location: /susers/build/php/access/signin/login-admin.php");
-//    exit();
-// }
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
+if ($_SESSION['user_type'] !== 'admin') {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

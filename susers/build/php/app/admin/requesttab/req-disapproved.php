@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin/Disapproved</title>
     <link rel="stylesheet" href="/susers/build/css/output.css">
+    <script src="/susers/build/php/app/admin/backend/ajax/disapproved-req.js"></script>
 </head>
 <body class="font-sans bg-gray-100">
 <nav class="fixed top-0 z-40 w-full bg-gray-100">
@@ -167,48 +168,70 @@
       </div>
    </form>
 
-     <div class="max-w border" style="height: 38rem;">
+   <?php
+$stmt = $pdo->prepare("
+SELECT ra.*, rf.*
+FROM req_assessment ra
+JOIN request_form rf ON ra.req_id = rf.req_id
+WHERE ra.req_status = 'disapproved'
+");
+$stmt->execute();
+$approved = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+?>
+<div class="max-w" style="height: 38rem;">
       <div class="shadow-md h-full overflow-y-auto sm:rounded-md bg-white">
          <table class="table-fixed w-full">
             <thead class="sticky top-0 bg-[#47BC8D]">
               <tr>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Requeste Control No.</th>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Requester Name</th>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Service Type</th>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Date Requested</th>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Date Disapproved</th>
-                  <th class="w-10"></th>
-                  <th class="w-20"></th>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Control no.</th>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Request by</th>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Services</th>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Requested on</th>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Disapproved on</th>
+                  <th class="w-12"></th> 
               </tr>
             </thead>
+            <?php if (isset($approved) && !empty($approved)) : ?>
+                <?php foreach ($approved as $index => $approveds) : ?>
             <tbody>
-              <!-- Example data -->
-              <tr>
-               <td class="px-2 py-4">
-                    2024-05-300
-               </td>
-               <td class="px-2 py-4">
-                   Juan Carlo
-               </td>
-               <td class="px-2 py-4">
-                   Cleaning, Landscaping 
-               </td>
-               <td class="px-2 py-4">
-                   Dec 10, 2002
-               </td>
-               <td class="px-2 py-4">
-                   Dec 10, 2002
-               </td>
-               <td class="py-3 justify-center">
-                  <button data-modal-target="overview" data-modal-toggle="overview" class="bg-green-500 hover:bg-green-600 py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon"></button>
-               </td>
-               <td class=" px-2 justify-center">
-                  <button data-modal-target="retrive_btn" data-modal-toggle="retrive_btn" class="bg-green-500 hover:bg-green-600 py-2 px-2 rounded-md text-white">Retrive</button>
-               </td>
-            </tr>         
+               <tr class="border">
+                  <td class="px-2 py-4"><?php echo $approveds['req_control_code'];?></td>
+                  <td class="px-2 py-4"><?php echo $approveds['fname'] . ' ' . $approveds['lname'];?></td>
+                  <td class="px-2 py-4"><?php echo $approveds['service'];?></td>
+                  <td class="px-2 py-4"><?php echo $approveds['date_requested'];?></td>
+                  <td class="px-2 py-4"><?php echo $approveds['datereq_assessment'];?></td>
+                  <td class="py-4 justify-center">
+                     <button class="overview-btn bg-green-500 hover:bg-green-600 py-2 px-2 rounded-md"
+                        data-req-id="<?php echo $approveds['req_id']; ?>"
+                        data-req-con-num="<?php echo $approveds['req_control_code']; ?>"
+                        data-date-req="<?php echo $approveds['date_requested']; ?>"
+                        data-date-need="<?php echo $approveds['date_needed'];?>"
+                        data-time-need="<?php echo $approveds['time_needed'];?>"
+                        data-req-name="<?php echo $approveds['fname'] . ' ' . $approveds['lname']; ?>"
+                        data-mobile-num="<?php echo $approveds['mobile_num']; ?>"
+                        data-department="<?php echo $approveds['department']; ?>"
+                        data-service-selected="<?php echo $approveds['service']; ?>"
+                        data-purpose="<?php echo $approveds['description']; ?>"
+                        data-location="<?php echo $approveds['location']; ?>"
+                        req-assesment-date-disapproved="<?php echo $approveds['datereq_assessment'];?>";
+                        req-remarks = "<?php echo $approveds['remark'];?>";>
+                     <img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon"></button>
+                  </td>
+               </tr>
+               <tr>
+               <?php endforeach; ?>
+                   <?php else : ?>
+                       <td class="p-5 text-lg font-medium text-green-600 border" colspan="7">No Disapproved Request.</td>
+                   <?php endif; ?>
+               </tr>    
             </tbody>
           </table>
       </div>
+</div>
+
+
+
 <!--Modal for Retrive-->
 <div id="retrive_btn" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
    <div class="relative p-4 w-full max-w-md max-h-full">
@@ -233,15 +256,10 @@
    </div>
 </div>
 
-
-
-
-
-<!--Modal for View-->
-<div id="overview" tabindex="-1" class="fixed top-0 hidden left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-<div id="overviewchild" class="relative w-full max-w-4xl max-h-full">
+<div id="overview-modal" tabindex="-1" class="fixed top-0 hidden left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<div id="overview-modal" class="fixed inset-0 bg-gray-800 bg-opacity-60 flex items-center justify-center">
         <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow">
+        <div class="relative bg-white rounded-lg shadow max-w-5xl">
             <!-- Modal header -->
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                <div class="flex flex-row w-full">
@@ -254,9 +272,9 @@
                      <h3 class="text-xl font-medium text-gray-600 pl-4">
                         Request Assesment
                      </h3>
-                  </div>   
+                  </div>
                </div>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-600 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:text-white" data-modal-hide="overview">
+                <button id="modal-close-btn" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-600 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:text-white">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
@@ -264,53 +282,80 @@
                 </button>
             </div>
             <!-- Modal body -->
-            <div class="flex flex-row gap-2">
-               <div class="p-4 md:p-5 space-y-2 w-1/2 overflow-y-auto ">
-                  <p class="text-base leading-relaxed text-gray-500">
-                  <b>Request Control Number:</b> 2024-05-30
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                  <b>Date Requested:</b> Dec 10, 2002
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                  <b>Start Date</b> Dec 10, 2002
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                  <b>Requester Name:</b> Jhon Michle
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                    <b>Mobile Number:</b> 09090912345
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                    <b>Department:</b> Institute of Computing
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                    <b>Service Selected:</b> Cleaning, Maintinance, Repair
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                    <b>Purpose/Description of the Request:</b>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                    <b>Location:</b> Lorem ipsum dolor sit amet
-                  </p>
+            <div class="flex flex-row gap-2 h-96 w-full">
+
+               <div class="p-4 md:p-5 space-y-2 w-1/2 overflow-y-auto bg-gray-200">
+                  <div class="w-full h-40 text-base text-gray-700 flex flex-col gap-1">
+                     <input id="modal-req-id" type="hidden">
+                  <div class="flex flex-row gap-1 w-full">
+                     <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm w-full text-nowrap">
+                        <b>Request Control Number:</b>
+                        <p id="modal-req-con"></p>
+                     </div>
+                     <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm w-full">
+                        <b>Date Requested:</b>
+                        <p id="modal-date-req"></p>
+                     </div>
+                  </div>
+
+                  <div class="flex flex-row gap-1 w-full">
+                     <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm w-1/2">
+                        <b>Date Needed:</b>
+                        <p id="modal-date-needed"></p>
+                     </div>
+                     <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm w-1/2">
+                        <b>Time Needed:</b>
+                        <p id="modal-time-needed"></p>
+                     </div>
+                  </div>
+
+                  <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm">
+                     <b>Requester Name:</b>
+                     <p id="modal-requestername"></p>
+                  </div>
+                  <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm">
+                     <b>Mobile Number:</b>
+                     <p id="modal-mobilenum"></p>
+                  </div>
+                  <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm">
+                     <b>Department:</b>
+                     <p id="modal-department"></p>
+                  </div>
+                  <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm">
+                     <b>Service Selected:</b>
+                     <p id="modal-service"></p>
+                   </div>
+                  <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm">
+                     <b>Purpose/Description of the Request:</b>
+                     <p id="modal-description"></p>
+                   </div>
+                  <div class="leading-relaxed flex flex-col px-1 py-2 bg-white rounded-sm">
+                     <b>Location:</b>
+                     <p id="modal-location"></p>
+                   </div>
+                  </div>
                </div>
 
-               <div class="p-4 md:p-5 space-y-2 w-1/2 overflow-y-auto">
-                  <p class="text-base leading-relaxed text-gray-500">
-                     <b>Date Disapproved:</b> Dec 10, 2002
-                  </p>
-                  <p class="text-base leading-relaxed text-gray-500">
-                     <b>Remarks:</b> Lorem ipsum dolor sit amet, consectetur adipiscing elit
-                  </p>
-                  <a href="" class="hover:underline flex flex-row gap-1 py-1 px-2 rounded-md text-green-600 font-medium uppercase">Print Administrative Services Request Form</a>
-               </div>
+               <div class="p-4 md:p-5 space-y-4 overflow-y-auto bg-gray-200">
+                  <div class="w-full h-40 text-gray-700 flex gap-1 flex-col">
+                     <div class="text-base leading-relaxed bg-white px-2 py-2 rounded-sm">
+                        <b>Date Disapproved:</b> <p id="modal-datedisapproved"></p>
+                     </div>
+                     <div class="text-base leading-relaxed bg-white px-2 py-2 rounded-sm">
+                        <b>Remarks:</b> <p id="modal-remarks"></p>
+                     </div>
+                     <a href="" class="hover:underline flex flex-row gap-1 py-1 px-2 rounded-md text-green-600 font-medium uppercase">Print Administrative Services Request Form</a>
+                  </div>
+               </div>      
             </div>
-</div>
-</div>
-
-     </div>
+     <!-- Footer -->
+     <div class="flex h-14 border-t border-gray-200 rounded-b">
+      </div>
   </div>
+
+
+
+
 </body>
 <script src="/susers/node_modules/flowbite/dist/flowbite.min.js"></script>
 <script src="/susers/node_modules/flowbite/dist/datepicker.js"></script>
