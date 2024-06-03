@@ -24,12 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['loggedin'] = true;
                 $_SESSION['user_type'] = $user['user_type'];
                 $_SESSION['user'] = $user;
-
-                if ($user['user_type'] == 'staff') {
-                    header("Location: /susers/build/php/app/staff/index.php");
-                } else if ($user['user_type'] == 'personnel') {
-                    header("Location: /susers/build/php/app/personnel/index.php");
-                }
+                header("Location: /susers/build/php/app/personnel/index.php");
                 exit();
             } else {
                 $_SESSION['message'] = "Incorrect password!";
@@ -48,6 +43,8 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
         header("Location: /susers/build/php/app/staff/index.php");
     } else if ($_SESSION['user_type'] == 'personnel') {
         header("Location: /susers/build/php/app/personnel/index.php");
+    }else if ($_SESSION['user_type'] == 'admin') {
+        header("Location: /susers/build/php/app/admin/index.php");
     }
     exit();
 }

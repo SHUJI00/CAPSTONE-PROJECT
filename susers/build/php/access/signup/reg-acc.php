@@ -19,6 +19,7 @@
         <label for="user_type">Select user type:</label>
         <select id="user_type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-fit p-2.5">
               <option value="select user type">--Select user type--</option>
+              <option value="admin">Admin</option>
               <option value="staff">Staff</option>
               <option value="personnel">Personnel</option>
         </select required>

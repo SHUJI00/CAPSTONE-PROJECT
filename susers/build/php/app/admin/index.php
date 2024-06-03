@@ -44,7 +44,7 @@ if ($_SESSION['user_type'] !== 'admin') {
               <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">
                 <div class="px-4 py-3" role="none">
                   <p class="text-sm text-gray-900" role="none">
-                    Engr. Noel Herira E. Sanches
+                  <?php echo $_SESSION['user']['fname'].' '.$_SESSION['user']['lname']; ?>
                   </p>
                   <p class="text-sm font-medium text-gray-900 truncate" role="none">
                     Administrator

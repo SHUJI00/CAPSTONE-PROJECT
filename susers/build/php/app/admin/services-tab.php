@@ -1,4 +1,15 @@
-<?php include 'config.php';?>
+<?php 
+session_start();
+include 'config.php';
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
+if ($_SESSION['user_type'] !== 'admin') {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +17,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin/Services</title>
     <link rel="stylesheet" href="/susers/build/css/output.css">
-    <link rel="stylesheet" href="/susers/build/css/alert.css">
+    <link rel="stylesheet" href="/susers/build/css/acc_alert.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/susers/build/php/app/admin/backend/ajax/service-ajx.js"></script>
     <script src="/susers/build/php/app/admin/backend/ajax/overview-jquery.js"></script>
@@ -37,7 +48,7 @@
               <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">
                 <div class="px-4 py-3" role="none">
                   <p class="text-sm text-gray-900" role="none">
-                    Engr. Noel Herira E. Sanches
+                     <?php echo $_SESSION['user']['fname'].' '.$_SESSION['user']['lname']; ?>
                   </p>
                   <p class="text-sm font-medium text-gray-900 truncate" role="none">
                     Administrator
@@ -183,18 +194,17 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
          <table class="table-fixed w-full">
             <thead class="sticky top-0 bg-[#47BC8D]">
               <tr>
-                <td class="w-1/3 text-left text-white p-1.5">Service Number</td>
+                <td class="w-1/3 text-left text-white p-1.5 hidden">Service Number</td>
                 <td class="w-1/3 text-left text-white p-1.5">Date Added</td>
                 <td class="w-1/3 text-left text-white p-1.5">Service Name</td>
-                <th class="w-10"></th>
-                <th class="w-10"></th>
+                <th class="w-20 text-left text-white p-1.5">Action</th>
               </tr>
             </thead>
             <?php if (isset($services) && !empty($services)) : ?>
                 <?php foreach ($services as $index => $service) : ?>
             <tbody>
               <tr class="border">
-                <td class="px-2 py-4"><?php echo $service['service_id']; ?></td>
+                <td class="px-2 py-4 hidden"><?php echo $service['service_id']; ?></td>
                 <td class="px-2 py-4"><?php echo $service['date_added']; ?></td>
                 <td class="px-2 py-4"><?php echo $service['service_name']; ?></td>
                 <td class="py-3 justify-center">
@@ -205,9 +215,7 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         data-description="<?php echo $service['description']; ?>">
                     <img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon">
                 </button>
-               </td>
-               <td class="py-3 justify-center">
-                  <button data-modal-target="delete_btn" data-modal-toggle="delete_btn" class="bg-[#EB6B23] hover:bg-[#AE501C] py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/delete.png" alt="viewicon"></button>
+                <button id="delete_btn" class="bg-[#EB6B23] hover:bg-[#AE501C] py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/delete.png" alt="viewicon"></button>
                </td>
             </tr>
             <tr>
@@ -286,16 +294,31 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!--Alert Message-->
 <div id="alert" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-yellow-800" role="alert">
     <div class="flex justify-center">
-        <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-        </svg>
+            <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            </svg>
         <div>
             <span id="alert-message" class="font-medium"></span>
         </div>
     </div>
 </div>
 
-
+<div id="confirmation" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-gray-800 h-screen" role="alert">
+   <div class="flex justify-center">
+      <div class=" flex justify-center w-fit bg-white px-5 py-5 rounded-md shadow-md">
+               <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+               </svg>
+           <div>
+               <span id="confirm-message" class="font-medium"></span>
+               <div class="mt-4 flex justify-end">
+                  <button id="alert-submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded me-2">Confirm</button>
+                  <button id="alert-cancel" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Cancel</button>
+               </div>
+           </div>
+      </div>
+   </div>
+</div>
 
 
 </body>

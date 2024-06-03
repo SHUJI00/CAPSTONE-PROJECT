@@ -1,9 +1,10 @@
 $(document).ready(function() {
+    
     $('#approved_btn').click(function() {
         const sp = $('#selectedPersonnel').val();
         const splvl = $('#selectedPriolevel').val();
         const swc = $('#selectedWorkcomplx').val();
-
+    
         if (sp.trim() === '') {
             showAlert("There's no selected personnel.");
             return;
@@ -16,35 +17,56 @@ $(document).ready(function() {
             showAlert("There's no selected work complexity.");
             return;
         }
-        const formFields = {
-            'modal-req-id': 'Request ID',
-            'selectedPersonnel': 'Selected Personnel',
-            'selectedPriolevel': 'Priority Level',
-            'selectedWorkcomplx': 'Work Complexity',
-            'remark': 'Request Assessment Remark'
-        };
-        let formData = {};
-        $.each(formFields, function(id) {
-            formData[id] = $('#' + id).val();
-        });
 
-        $.ajax({
-            url: '/susers/build/php/app/admin/backend/req-pen-post.php',
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-                showAlert(response, true);
-                setTimeout(function() {
-                    window.location.reload();
-                }, 3000);
-            },
-            error: function(xhr, status, error) {
-                console.log(xhr.responseText);
-                showAlert('An error occurred while updating the data. Status: ' + status + ', Error: ' + error);
-            }
-        });
+        // Show confirmation modal
+        $('#confirm-message').text("Are you sure you want to submit the assessed form?");
+        $('#confirmation').css('display', 'flex');
+        setTimeout(() => $('#confirmation').addClass('show'), 10);
+    
+        // Handle Submit button click
+        $('#alert-submit').off('click').on('click', function() {
+            $('#confirmation').removeClass('show');
+            setTimeout(() => $('#confirmation').css('display', 'none'), 300);
+    
+    const formFields = {
+        'modal-req-id': 'Request ID',
+        'selectedPersonnel': 'Selected Personnel',
+        'selectedPriolevel': 'Priority Level',
+        'selectedWorkcomplx': 'Work Complexity',
+        'remark': 'Request Assessment Remark'
+    };
+    let formData = {};
+    $.each(formFields, function(id) {
+        formData[id] = $('#' + id).val();
     });
-    $('#disapproved_btn').click(function() {
+    $.ajax({
+        url: '/susers/build/php/app/admin/backend/req-pen-post.php',
+        type: 'POST',
+        data: formData,
+        success: function(response) {
+            showAlert(response, true);
+            setTimeout(function() {
+                window.location.reload();
+            }, 3000);
+        },
+        error: function(xhr, status, error) {
+            console.log(xhr.responseText);
+            showAlert('An error occurred while updating the data. Status: ' + status + ', Error: ' + error);
+        }
+    });
+});
+});
+
+$('#disapproved_btn').click(function() {
+    // Show confirmation modal
+    $('#confirm-message').text("Are you sure you want to disapproved this request?");
+    $('#confirmation').css('display', 'flex');
+    setTimeout(() => $('#confirmation').addClass('show'), 10);
+
+    // Handle Submit button click
+    $('#alert-submit').off('click').on('click', function() {
+        $('#confirmation').removeClass('show');
+        setTimeout(() => $('#confirmation').css('display', 'none'), 300);
         const formFields = {
             'modal-req-id': 'Request ID',
             'remark': 'Request Assessment Remark'
@@ -53,7 +75,6 @@ $(document).ready(function() {
         $.each(formFields, function(id) {
             formData[id] = $('#' + id).val();
         });
-
         $.ajax({
             url: '/susers/build/php/app/admin/backend/disapproved-post.php',
             type: 'POST',
@@ -71,30 +92,36 @@ $(document).ready(function() {
         });
     });
 });
-function showAlert(message, success = false) {
-    const alertMessage = document.getElementById('alert-message');
-    const alert = document.getElementById('alert');
-    alertMessage.textContent = message;
-    if (success) {
-        alert.classList.remove('text-yellow-800', 'bg-yellow-50');
-        alert.classList.add('success');
-    } else {
-        alert.classList.add('text-yellow-800', 'bg-yellow-50');
-        alert.classList.remove('success');
-    }
-    alert.classList.remove('hidden');
-    setTimeout(function() {
-        alert.classList.add('show');
-    }, 10);
-
-    setTimeout(function() {
-        alert.classList.remove('show');
+    // Handle Cancel button click
+    $('#alert-cancel').off('click').on('click', function() {
+        $('#confirmation').removeClass('show');
+        setTimeout(() => $('#confirmation').css('display', 'none'), 300);
+        showAlert("Submitting the assessed form has been cancelled.");
+    });
+});
+    //Show alert function
+    function showAlert(message, success = false) {
+        const alertMessage = document.getElementById('alert-message');
+        const alert = document.getElementById('alert');
+        alertMessage.textContent = message;
+        if (success) {
+            alert.classList.remove('text-yellow-800', 'bg-yellow-50');
+            alert.classList.add('success');
+        } else {
+            alert.classList.add('text-yellow-800', 'bg-yellow-50');
+            alert.classList.remove('success');
+        }
+        alert.classList.remove('hidden');
         setTimeout(function() {
-            alert.classList.add('hidden');
-        }, 500);
-    }, 3500);
-}
-
+            alert.classList.add('show');
+        }, 10);
+        setTimeout(function() {
+            alert.classList.remove('show');
+            setTimeout(function() {
+                alert.classList.add('hidden');
+            }, 500);
+        }, 3500);
+    }
 document.addEventListener('DOMContentLoaded', (event) => {
     const searchPersonnelInput = document.getElementById('search-personnel');
     const personnelList = document.getElementById('personnel-list');

@@ -1,4 +1,15 @@
-<?php include_once 'config.php';?>
+<?php 
+session_start();
+include 'config.php';
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
+if ($_SESSION['user_type'] !== 'admin') {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +47,7 @@
               <div class="z-50 hidden my-4 list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">
                 <div class="px-4 py-3" role="none">
                   <p class="text-sm text-gray-600" role="none">
-                    Engr. Noel Herira E. Sanches
+                     <?php echo $_SESSION['user']['fname'].' '.$_SESSION['user']['lname']; ?>
                   </p>
                   <p class="text-sm font-medium text-gray-600 truncate" role="none">
                     Administrator
@@ -184,11 +195,11 @@ $reqform = $stmt->fetchAll(PDO::FETCH_ASSOC);
          <table class="table-fixed w-full">
             <thead class="sticky top-0 bg-[#47BC8D]">
               <tr>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Requeste Control No.</td>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Service Name</td>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Date Requested</td>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Requester Name</td>
-                  <th class="w-20"></th>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Control No.</td>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Services</td>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Request on</td>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Request by</td>
+                  <th class="w-20 text-left text-white p-1.5 font-medium">Action</th>
               </tr>
             </thead>
             <?php if (isset($reqform) && !empty($reqform)) : ?>
@@ -213,15 +224,12 @@ $reqform = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         data-purpose="<?php echo $reqforms['description']; ?>"
                         data-location="<?php echo $reqforms['location']; ?>">
                      <img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon"></button>
-                     <button data-modal-target="delete_btn" data-modal-toggle="delete_btn" class="bg-[#EB6B23] hover:bg-[#AE501C] py-2 px-2 rounded-md">
-                        <img class="h-5" src="/susers/asset/icons/delete.png" alt="viewicon">
-                     </button>
                   </td>
                </tr>
                <tr>
                <?php endforeach; ?>
                    <?php else : ?>
-                       <td class="p-5 text-lg font-medium text-green-600">No New Request.</td>
+                       <td class="p-5 text-lg font-medium text-green-600">No Pending Request.</td>
                    <?php endif; ?>
                </tr>    
             </tbody>
@@ -414,7 +422,7 @@ $listpersonnel = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </div>
                             </li>
                         </ul>
-                     <h3 class="mt-3 font-semibold text-gray-600">Remarks</h3> <p class="text-sm text-gray-400">(Remark are both applicable in approved and disapproved buttons.)</p>
+                     <h3 class="mt-3 font-semibold text-gray-600">Remarks (Optional)</h3> <p class="text-sm text-gray-400">(Remark are both applicable in approved and disapproved buttons.)</p>
                      <textarea id="remark" rows="4" class="resize-none p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-green-500 focus:border-green-500" placeholder="Write your remarks here..."></textarea>
 
                   </div>
@@ -432,14 +440,32 @@ $listpersonnel = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <!--Alert Message-->
 <div id="alert" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-yellow-800" role="alert">
     <div class="flex justify-center">
-        <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-        </svg>
+            <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            </svg>
         <div>
             <span id="alert-message" class="font-medium"></span>
         </div>
     </div>
 </div>
+
+<div id="confirmation" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-gray-800 h-screen" role="alert">
+   <div class="flex justify-center">
+      <div class=" flex justify-center w-fit bg-white px-5 py-5 rounded-md shadow-md">
+               <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+               </svg>
+           <div>
+               <span id="confirm-message" class="font-medium"></span>
+               <div class="mt-4 flex justify-end">
+                  <button id="alert-submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded me-2">Submit</button>
+                  <button id="alert-cancel" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Cancel</button>
+               </div>
+           </div>
+      </div>
+   </div>
+</div>
+
 </body>
 <script src="/susers/node_modules/flowbite/dist/flowbite.min.js"></script>
 <script src="/susers/node_modules/flowbite/dist/datepicker.js"></script>
