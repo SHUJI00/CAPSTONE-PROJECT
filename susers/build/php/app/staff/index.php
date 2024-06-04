@@ -1,6 +1,6 @@
 <?php
 session_start();
-
+include 'config.php';
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header("Location: /susers/build/php/access/signin/login-staff.php");
     exit();
@@ -40,6 +40,7 @@ if ($_SESSION['user_type'] !== 'staff') {
               <div>
                 <button type="button" class="flex text-sm bg-gray-800 focus:ring-4 focus:ring-gray-300 w-8 h-8 rounded-full" aria-expanded="false" data-dropdown-toggle="dropdown-user">
                   <span class="sr-only">Open user menu</span>
+                  imgage
                 </button>
               </div>
               <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">
@@ -68,9 +69,17 @@ if ($_SESSION['user_type'] !== 'staff') {
   </nav>
   
   <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-5 transition-transform -translate-x-full bg-green-700 md:translate-x-0 drop-shadow-2xl shadow-slate-800 rounded-r-xl" aria-label="Sidebar">
-   <a href="/susers/build/php/app/admin/index.php" class="flex md:me-24 mb-5 justify-center w-full">
-      <img src="/susers/asset/img/image-removebg-preview (2).png" class=" h-16 me-3" alt="FlowBite Logo"/>
+
+  <a href="/susers/build/php/app/staff/index.php" class="flex md:me-24 mb-5 justify-center w-full">
+      <div class="flex flex-col gap-2 items-center text-center justify-center">
+        <img class="h-6" src="/susers/asset/img/colored-logo.png" alt="woms-logo">
+        <div class="text-center flex flex-col items-center">
+            <h1 class="text-base w-70 font-semibold text-white">DAVAO DEL NORTE STATE COLLEGE</h1>
+            <p class=" text-xs text-white px-3 py-2 rounded-md font-semibold bg-green-500 w-fit">Work Order Management System</p>
+        </div>
+      </div>
     </a>
+
      <div class="h-full px-3 pb-4 overflow-y-auto bg-green-700">
         <ul class="space-y-2 font-medium">
            <li>
@@ -230,38 +239,50 @@ if ($_SESSION['user_type'] !== 'staff') {
             </div>
          </div>
       </div>
+      
       <h1 class="max-w text-xl text-medium text-gray-700">New Request</h1>
-      <div class=" h-80 max-w border">
-      <div class="shadow-md h-full overflow-y-auto sm:rounded-lg bg-white">
+
+<?php
+$stmt = $pdo->prepare("
+    SELECT rf.req_control_code, rf.service, rf.date_requested, rf.fname, rf.lname
+    FROM request_form rf
+    LEFT JOIN req_assessment ra ON rf.req_id = ra.req_id
+    WHERE ra.req_id IS NULL
+");
+$stmt->execute();
+$services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+<div class="h-80 max-w border">
+      <div class="shadow-md h-full overflow-y-auto sm:rounded-md bg-white">
          <table class="table-fixed w-full">
             <thead class="sticky top-0 bg-[#47BC8D]">
               <tr>
                   <th class="w-1/3 text-left text-white p-1.5 font-medium">Requeste Control No.</td>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Requester Name</td>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Service Type</td>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Service Name</td>
                   <th class="w-1/3 text-left text-white p-1.5 font-medium">Date Requested</td>
+                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Requester Name</td>
               </tr>
             </thead>
+            <?php if (isset($services) && !empty($services)) : ?>
+                <?php foreach ($services as $index => $service) : ?>
             <tbody>
-              <!-- Example data -->
-              <tr>
-              <td class="px-2 py-4">
-                    2024-05-300
-                </td>
-                <td class="px-2 py-4">
-                    Apple MacBook Pro 17"
-                </td>
-                <td class="px-2 py-4">
-                    Silver
-                </td>
-                <td class="px-2 py-4">
-                    Laptop
-                </td>
+              <tr class="border">
+                <td class="px-2 py-4"><?php echo $service['req_control_code'];?></td>
+                <td class="px-2 py-4"><?php echo $service['service'];?></td>
+                <td class="px-2 py-4"><?php echo $service['date_requested'];?></td>
+                <td class="px-2 py-4"><?php echo $service['fname'] . ' ' . $service['lname'];?></td>
             </tr>
+            <tr>
+            <?php endforeach; ?>
+                <?php else : ?>
+                    <td class="p-5 text-lg font-medium text-green-600">No New Request.</td>
+                <?php endif; ?>
+            </tr>    
             </tbody>
           </table>
       </div>
-  </div>
+</div>
+
 </div>
 </body>
 <script src="/susers/node_modules/flowbite/dist/flowbite.min.js"></script>

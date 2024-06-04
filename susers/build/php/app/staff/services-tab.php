@@ -1,11 +1,25 @@
+<?php 
+session_start();
+include 'config.php';
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+   header("Location: /susers/build/php/access/signin/login-staff.php");
+   exit();
+}
+if ($_SESSION['user_type'] !== 'staff') {
+   header("Location: /susers/build/php/access/signin/login-staff.php");
+   exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Staff/Services</title>
+    <title>Admin/Services</title>
     <link rel="stylesheet" href="/susers/build/css/output.css">
-
+    <link rel="stylesheet" href="/susers/build/css/acc_alert.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/susers/build/php/app/admin/backend/ajax/service-ajx.js"></script>
 </head>
 <body class="font-sans bg-gray-100">
 <nav class="fixed top-0 z-40 w-full bg-gray-100">
@@ -33,9 +47,9 @@
               <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">
                 <div class="px-4 py-3" role="none">
                   <p class="text-sm text-gray-900" role="none">
-                    Engr. Noel Herira E. Sanches
+                     <?php echo $_SESSION['user']['fname'].' '.$_SESSION['user']['lname']; ?>
                   </p>
-                     <p class="text-sm font-medium text-gray-900 truncate" role="none">
+                  <p class="text-sm font-medium text-gray-900 truncate" role="none">
                     Staff
                   </p>
                 </div>
@@ -44,7 +58,7 @@
                     <a href="/susers/build/php/app/staff/profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Profile</a>
                   </li>
                   <li>
-                    <a href="/susers/build/php/access/signin/login-staff.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
+                    <a href="/susers/build/php/app/staff/logout.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
                   </li>
                 </ul>
               </div>
@@ -56,8 +70,16 @@
   </nav>
   
   <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-5 transition-transform -translate-x-full bg-green-700 md:translate-x-0 drop-shadow-2xl shadow-slate-800 rounded-r-xl" aria-label="Sidebar">
-   <a href="/susers/build/php/app/admin/index.php" class="flex md:me-24 mb-5 justify-center w-full">
-      <img src="/susers/asset/img/image-removebg-preview (2).png" class=" h-16 me-3" alt="FlowBite Logo"/>
+  <a href="/susers/build/php/app/staff/index.php" class="flex md:me-24 mb-5 justify-center w-full">
+      
+      <div class="flex flex-col gap-2 items-center text-center justify-center">
+        <img class="h-6" src="/susers/asset/img/colored-logo.png" alt="woms-logo">
+        <div class="text-center flex flex-col items-center">
+            <h1 class="text-base w-70 font-semibold text-white">DAVAO DEL NORTE STATE COLLEGE</h1>
+            <p class=" text-xs text-white px-3 py-2 rounded-md font-semibold bg-green-500 w-fit">Work Order Management System</p>
+        </div>
+      </div>
+
     </a>
      <div class="h-full px-3 pb-4 overflow-y-auto bg-green-700">
         <ul class="space-y-2 font-medium">
@@ -122,7 +144,7 @@
   <div class="p-4 md:ml-64">
   <div class="flex gap-2 flex-col p-4 mt-8 md:mt-7">
 
-  <div class="flex flex-col gap-2.5">
+<div class="flex flex-col gap-2.5">
    <form class="max-w flex gap-2 bg-white px-2 py-2 rounded-xl justify-between shadow-md">
          <div class="flex justify-start flex-row max-w items-center">
             <img class="h-6 pl-2" src="/susers/asset/icons/filter.png" alt="filtericon">
@@ -163,106 +185,72 @@
       <button data-modal-target="add-service" data-modal-toggle="add-service" type="button" class="h-fit w-fit flex items-center gap-1 focus:outline-none text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-md text-base px-4 py-1 ml-3 uppercase"><img class="h-5" src="/susers/asset/icons/add.png" alt="addicon">add service</button>
       </div>
    </div>
-  
-   <div class="max-w border" style="height: 38rem;">
+<?php
+$stmt = $pdo->prepare("SELECT service_id, date_added, service_name, description FROM service_details");
+$stmt->execute();
+$services = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
+<div class="max-w border" style="height: 38rem;">
       <div class="shadow-md h-full overflow-y-auto sm:rounded-md bg-white">
          <table class="table-fixed w-full">
             <thead class="sticky top-0 bg-[#47BC8D]">
               <tr>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Service No.</th>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Service Name</th>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Description</th>
-                  <th class="w-1/3 text-left text-white p-1.5 font-medium">Date Added</th>
-                  <th class="w-10"></th>
-                  <th class="w-10"></th>
+                <td class="w-full text-left text-white p-1.5">Added on</td>
+                <td class="w-full text-left text-white p-1.5">Service Name</td>
+                <th class="w-20 text-left text-white p-1.5">Action</th>
               </tr>
             </thead>
+            <?php if (isset($services) && !empty($services)) : ?>
+                <?php foreach ($services as $index => $service) : ?>
             <tbody>
-              <!-- Example data -->
-              <tr class="border">
-               <td class="px-2 py-4">
-                    1
+              <tr>
+                <td class="px-2 py-4 hidden"><?php echo $service['service_id']; ?></td>
+                <td class="px-2 py-4"><?php echo $service['date_added']; ?></td>
+                <td class="px-2 py-4"><?php echo $service['service_name']; ?></td>
+                <td class="py-3">
+                  <button class="overview-btn bg-green-500 hover:bg-green-600 py-2 px-2 rounded-md" 
+                          data-date-added="<?php echo $service['date_added']; ?>"
+                          data-service-name="<?php echo $service['service_name']; ?>"
+                          data-description="<?php echo $service['description']; ?>">
+                      <img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon">
+                  </button>
+                  <button id="delete_btn" class="bg-orange-500 hover:bg-orange-600 py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/delete.png" alt="viewicon"></button>
                </td>
-               <td class="px-2 py-4">
-                   Cleaning
-               </td>
-               <td class="px-2 py-4">
-                   Cleaning the area
-               </td>
-               <td class="px-2 py-4">
-                   Dec 30, 2002
-               </td>
-               <td class="py-3 justify-center">
-                  <button data-modal-target="overview" data-modal-toggle="overview" class="bg-green-500 hover:bg-green-600 py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon"></button>
-               </td>
-               <td class="py-3 justify-center">
-                  <button data-modal-target="delete_btn" data-modal-toggle="delete_btn" class="bg-[#EB6B23] hover:bg-[#AE501C] py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/delete.png" alt="viewicon"></button>
-               </td>
-            </tr>         
+            </tr>
+            <tr>
+            <?php endforeach; ?>
+                <?php else : ?>
+                    <td class="p-5 text-lg font-medium text-green-600">No record found.</td>
+                <?php endif; ?>
+            </tr>    
             </tbody>
           </table>
       </div>
-     
-
-<div id="delete_btn" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative p-4 w-full max-w-md max-h-full">
-        <div class="relative bg-white rounded-lg shadow">
-            <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="delete_btn">
-                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                </svg>
-                <span class="sr-only">Close modal</span>
-            </button>
-            <div class="p-4 md:p-5 text-center">
-                <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                </svg>
-                <h3 class="mb-5 text-lg font-normal text-gray-500">Are you sure you want to delete request control no 2024-05-300?</h3>
-                <button data-modal-hide="delete_btn" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
-                    Yes, I'm sure
-                </button>
-                <button data-modal-hide="delete_btn" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">No, cancel</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="overview" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
-    <div class="relative w-full max-w-lg max-h-full">
-        <!-- Modal content -->
-        <div class="relative bg-white rounded-lg shadow">
+<!--Overview Service-->
+<div id="overview-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div id="overview-modal" class="fixed inset-0 bg-gray-800 bg-opacity-60 flex items-center justify-center">
+        <div name="content" class="bg-white rounded-lg shadow flex flex-col max-w-sm w-full mx-4">
             <!-- Modal header -->
             <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
                 <h3 class="text-xl font-medium text-gray-900">
                     Service Details
                 </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="overview">
+                <button id="modal-close-btn" type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center">
                     <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
                     </svg>
-                    <span class="sr-only">Close modal</span>
                 </button>
             </div>
             <!-- Modal body -->
-            <div class="p-4 md:p-5 space-y-1">
-            <p class="text-base leading-relaxed text-gray-500">
-                   <b>Service Number:</b> 001
-                </p>
-                <p class="text-base leading-relaxed text-gray-500">
-                    <b>Date Added:</b> Dec 30, 2002
-                </p>
-                <p class="text-base leading-relaxed text-gray-500">
-                    <b>Service Name:</b> Cleaning
-                </p>
-                <p class="text-base leading-relaxed text-gray-500">
-                    <b>Description:</b> Cleaning messy area
-                </p>
+            <div class="p-4 md:p-5 space-y-1 font-semibold text-base text-gray-600">
+                <p>Date Added: <span class="font-medium" id="modal-date-added"></span></p>
+                <p>Service Name: <span class="font-medium" id="modal-service-name"></span></p>
+                <p>Description: <span class="font-medium" id="modal-description"></span></p>
             </div>
-            <!-- Modal footer -->
         </div>
     </div>
 </div>
-
+<!--Add Service-->
 <div id="add-service" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-lg max-h-full">
         <!-- Modal content -->
@@ -283,24 +271,53 @@
             <div class="p-4 md:p-5 space-y-1">
                  <div class="grid gap-4 mb-4 grid-cols-2">
                   <div class="col-span-2">
-                     <label for="username" class="block mb-2 text-sm font-medium text-gray-900">Service Name</label>
-                     <input type="text" name="username" id="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" required="">
+                     <label for="servicename" class="block mb-2 text-sm font-medium text-gray-900">Service Name</label>
+                     <input type="text" name="servicename" id="servicename" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" required="">
                  </div>
                  <div class="col-span-2">
-                    <label for="newpass" class="block mb-2 text-sm font-medium text-gray-900">Service Description</label>
-                    <textarea id="message" rows="4" class="resize-none p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-green-500 focus:border-green-500" placeholder="Write your remarks here..."></textarea>
+                    <label for="description" class="block mb-2 text-sm font-medium text-gray-900">Service Description</label>
+                    <textarea id="description" name="description" rows="4" class="resize-none p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-green-500 focus:border-green-500" placeholder="Write your remarks here..."></textarea>
                  </div>
             </div>
             <!-- Modal footer -->
             <div class="flex pt-2 border-t border-gray-200 rounded-b justify-end">
-               <button type="button" class="bg-green-600 hover:bg-green-700 flex flex-row gap-1 py-2 px-2 rounded-md text-white font-medium uppercase"><img class="h-5" src="/susers/asset/icons/add.png" alt="addicon">Add</button>
+               <button id="add-services-btn" type="button" class="bg-green-600 hover:bg-green-700 flex flex-row gap-1 py-2 px-2 rounded-md text-white font-medium uppercase"><img class="h-5" src="/susers/asset/icons/add.png" alt="addicon">Add</button>
             </div>
         </div>
     </div>
 </div>
-
-     </div>
+</div>
   </div>
+<!--Alert Message-->
+<div id="alert" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-yellow-800" role="alert">
+    <div class="flex justify-center">
+            <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+               <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+            </svg>
+        <div>
+            <span id="alert-message" class="font-medium"></span>
+        </div>
+    </div>
+</div>
+
+<div id="confirmation" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-gray-600 h-screen" role="alert">
+   <div class="flex justify-center">
+      <div class="flex justify-center w-fit bg-white px-5 py-5 rounded-md shadow-2xl text-orange-500">
+               <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+               </svg>
+           <div>
+               <span id="confirm-message" class="font-medium"></span>
+               <div class="mt-4 flex justify-end">
+                  <button id="alert-submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded me-2">Confirm</button>
+                  <button id="alert-cancel" class="text-gray-800 bg-gray-100 hover:bg-gray-300 px-4 py-2 rounded">Cancel</button>
+               </div>
+           </div>
+      </div>
+   </div>
+</div>
+
+
 </body>
 <script src="/susers/node_modules/flowbite/dist/flowbite.min.js"></script>
 <script src="/susers/node_modules/flowbite/dist/datepicker.js"></script>

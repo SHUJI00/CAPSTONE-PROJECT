@@ -71,7 +71,13 @@ if ($_SESSION['user_type'] !== 'admin') {
   
   <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-5 transition-transform -translate-x-full bg-green-700 md:translate-x-0 drop-shadow-2xl shadow-slate-800 rounded-r-xl" aria-label="Sidebar">
   <a href="/susers/build/php/app/admin/index.php" class="flex md:me-24 mb-5 justify-center w-full">
-      <img src="/susers/asset/img/image-removebg-preview (2).png" class=" h-16 me-3" alt="FlowBite Logo"/>
+      <div class="flex flex-col gap-2 items-center text-center justify-center">
+        <img class="h-6" src="/susers/asset/img/colored-logo.png" alt="woms-logo">
+        <div class="text-center flex flex-col items-center">
+            <h1 class="text-base w-70 font-semibold text-white">DAVAO DEL NORTE STATE COLLEGE</h1>
+            <p class=" text-xs text-white px-3 py-2 rounded-md font-semibold bg-green-500 w-fit">Work Order Management System</p>
+        </div>
+      </div>
     </a>
      <div class="h-full px-3 pb-4 overflow-y-auto bg-green-700">
         <ul class="space-y-2 font-medium">
@@ -144,7 +150,7 @@ if ($_SESSION['user_type'] !== 'admin') {
   <div class="p-4 md:ml-64">
      <div class="flex gap-2 flex-col p-4 mt-8 md:mt-7">
 
-     <form class="max-w flex justify-end gap-2">
+     <form class="max-w flex justify-center items-center gap-2">
       <div class="flex justify-start flex-row max-w items-center">
          <img class="h-6 pl-2" src="/susers/asset/icons/filter.png" alt="filtericon">
          <p class="mr-2 text-gray-600">Filter:</p>
@@ -154,7 +160,7 @@ if ($_SESSION['user_type'] !== 'admin') {
                   <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
                   </svg>
             </div>
-            <input datepicker datepicker-buttons datepicker-autoselect-today type="text" name="start" class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5" placeholder="Select date start">
+            <input datepicker datepicker-buttons datepicker-autoselect-today type="text" name="start" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-40 ps-10 p-2.5" placeholder="Select date start">
             </div>
             <span class="mx-4 text-gray-500">to</span>
             <div class="relative max-w-sm">
@@ -163,20 +169,60 @@ if ($_SESSION['user_type'] !== 'admin') {
                   <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
                   </svg>
             </div>
-            <input datepicker datepicker-buttons datepicker-autoselect-today type="text" name="end" class="bg-gray-50 border border-gray-300 text-gray-600 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5" placeholder="Select date end">
+            <input datepicker datepicker-buttons datepicker-autoselect-today type="text" name="end" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-40 ps-10 p-2.5" placeholder="Select date end">
             </div>
-            <button type="button" class="focus:outline-none text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-md px-4 py-2 ml-3">Filter</button>
+            <button type="button" class="focus:outline-none text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-md text-base px-4 py-2 ml-3">Filter</button>
          </div>
+   <select id="search-by" class="block w-fit h-fit text-sm text-gray-600 border border-gray-300 rounded-lg bg-gray-50 focus:ring-green-500 focus:border-green-500">
+        <option value="requested-by">Requested by</option>
+        <option value="services">Services</option>
+    </select>
+
+
+
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+    const searchInput = document.getElementById('default-search');
+    const searchByDropdown = document.getElementById('search-by');
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    searchInput.addEventListener('input', filterTable);
+    searchByDropdown.addEventListener('change', filterTable);
+
+    function filterTable() {
+        const searchValue = searchInput.value.trim().toLowerCase();
+        const searchBy = searchByDropdown.value;
+
+        tableRows.forEach(row => {
+            let textContent;
+            if (searchBy === 'requested-by') {
+                textContent = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+            } else if (searchBy === 'services') {
+                textContent = row.querySelector('td:nth-child(3)').textContent.trim().toLowerCase();
+            }
+
+            if (textContent.includes(searchValue)) {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+});
+
+
+</script>
+
       <div class="w-80">   
-         <label for="default-search" class="mb-2 text-sm font-medium text-gray-600 sr-only">Search</label>
+         <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
          <div class="relative">
             <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                </svg>
             </div>
-            <input type="search" id="default-search" class="block w-full p-4 ps-10 text-sm text-gray-600 border border-gray-300 rounded-lg bg-gray-50 focus:ring-green-500 focus:border-green-500" placeholder="Name or Service Type"/>
-            <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-4 py-2">Search</button>
+            <input type="search" id="default-search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-green-500 focus:border-green-500" placeholder="Name or Service Type"/>
+            <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-green-500 hover:bg-green-600 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2">Search</button>
          </div>
       </div>
    </form>
@@ -235,29 +281,6 @@ $reqform = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </tbody>
           </table>
       </div>
-</div>
-
-<div id="delete_btn" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
-   <div class="relative p-4 w-full max-w-md max-h-full">
-      <div class="relative bg-white rounded-lg shadow">
-         <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-600 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="delete_btn">
-            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-               <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-            </svg>
-               <span class="sr-only">Close modal</span>
-         </button>
-            <div class="p-4 md:p-5 text-center">
-               <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-               </svg>
-               <h3 class="mb-5 text-lg font-normal text-gray-500">Are you sure you want to delete request control no 2024-05-300?</h3>
-               <button data-modal-hide="delete_btn" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
-                  Yes, I'm sure
-               </button>
-               <button data-modal-hide="delete_btn" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-600 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-4 focus:ring-gray-100">No, cancel</button>
-            </div>
-      </div>
-   </div>
 </div>
 
 <div id="overview-modal" tabindex="-1" class="fixed top-0 hidden left-0 right-0 z-50 w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -451,7 +474,7 @@ $listpersonnel = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <div id="confirmation" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-gray-800 h-screen" role="alert">
    <div class="flex justify-center">
-      <div class=" flex justify-center w-fit bg-white px-5 py-5 rounded-md shadow-md">
+      <div class=" flex justify-center w-fit bg-white px-5 py-5 rounded-md shadow-2xl">
                <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                </svg>
@@ -459,7 +482,7 @@ $listpersonnel = $stmt->fetchAll(PDO::FETCH_ASSOC);
                <span id="confirm-message" class="font-medium"></span>
                <div class="mt-4 flex justify-end">
                   <button id="alert-submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded me-2">Submit</button>
-                  <button id="alert-cancel" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Cancel</button>
+                  <button id="alert-cancel" class="text-gray-800 bg-gray-100 hover:bg-gray-300 px-4 py-2 rounded">Cancel</button>
                </div>
            </div>
       </div>

@@ -20,7 +20,6 @@ if ($_SESSION['user_type'] !== 'admin') {
     <link rel="stylesheet" href="/susers/build/css/acc_alert.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/susers/build/php/app/admin/backend/ajax/service-ajx.js"></script>
-    <script src="/susers/build/php/app/admin/backend/ajax/overview-jquery.js"></script>
 </head>
 <body class="font-sans bg-gray-100">
 <nav class="fixed top-0 z-40 w-full bg-gray-100">
@@ -72,7 +71,15 @@ if ($_SESSION['user_type'] !== 'admin') {
   
   <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-5 transition-transform -translate-x-full bg-green-700 md:translate-x-0 drop-shadow-2xl shadow-slate-800 rounded-r-xl" aria-label="Sidebar">
   <a href="/susers/build/php/app/admin/index.php" class="flex md:me-24 mb-5 justify-center w-full">
-      <img src="/susers/asset/img/image-removebg-preview (2).png" class=" h-16 me-3" alt="FlowBite Logo"/>
+      
+      <div class="flex flex-col gap-2 items-center text-center justify-center">
+        <img class="h-6" src="/susers/asset/img/colored-logo.png" alt="woms-logo">
+        <div class="text-center flex flex-col items-center">
+            <h1 class="text-base w-70 font-semibold text-white">DAVAO DEL NORTE STATE COLLEGE</h1>
+            <p class=" text-xs text-white px-3 py-2 rounded-md font-semibold bg-green-500 w-fit">Work Order Management System</p>
+        </div>
+      </div>
+
     </a>
      <div class="h-full px-3 pb-4 overflow-y-auto bg-green-700">
         <ul class="space-y-2 font-medium">
@@ -167,6 +174,55 @@ if ($_SESSION['user_type'] !== 'admin') {
                </div>
                <button type="button" class="focus:outline-none text-white bg-green-500 hover:bg-green-600 focus:ring-4 focus:ring-green-300 font-medium rounded-md text-base px-4 py-2 ml-3">Filter</button>
             </div>
+
+            <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById('default-search');
+        const tableRows = document.querySelectorAll('tbody tr');
+
+        searchInput.addEventListener('input', filterTable);
+
+        let currentSearchTerm = '';
+
+        function filterTable() {
+            const searchValue = searchInput.value.trim().toLowerCase();
+
+            // Check if the new search term is a continuation of the previous one
+            if (searchValue.startsWith(currentSearchTerm)) {
+                // Update the current search term
+                currentSearchTerm = searchValue;
+
+                tableRows.forEach(row => {
+                    let service = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+
+                    // Check if the service name starts with the current search term
+                    if (service.startsWith(currentSearchTerm)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            } else {
+                // If the new search term is not a continuation of the previous one,
+                // reset the current search term and perform a full search
+                currentSearchTerm = searchValue;
+
+                tableRows.forEach(row => {
+                    let service = row.querySelector('td:nth-child(2)').textContent.trim().toLowerCase();
+
+                    // Check if the service name starts with the current search term
+                    if (service.startsWith(currentSearchTerm)) {
+                        row.style.display = 'table-row';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+        }
+    });
+</script>
+
+
          <div class="w-80">   
             <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only">Search</label>
             <div class="relative">
@@ -194,28 +250,27 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
          <table class="table-fixed w-full">
             <thead class="sticky top-0 bg-[#47BC8D]">
               <tr>
-                <td class="w-1/3 text-left text-white p-1.5 hidden">Service Number</td>
-                <td class="w-1/3 text-left text-white p-1.5">Date Added</td>
-                <td class="w-1/3 text-left text-white p-1.5">Service Name</td>
+                <td class="w-full text-left text-white p-1.5">Added on</td>
+                <td class="w-full text-left text-white p-1.5">Service Name</td>
                 <th class="w-20 text-left text-white p-1.5">Action</th>
               </tr>
             </thead>
+            <tbody>
             <?php if (isset($services) && !empty($services)) : ?>
                 <?php foreach ($services as $index => $service) : ?>
-            <tbody>
-              <tr class="border">
+
+              <tr>
                 <td class="px-2 py-4 hidden"><?php echo $service['service_id']; ?></td>
                 <td class="px-2 py-4"><?php echo $service['date_added']; ?></td>
                 <td class="px-2 py-4"><?php echo $service['service_name']; ?></td>
-                <td class="py-3 justify-center">
-                <button class="overview-btn bg-green-500 hover:bg-green-600 py-2 px-2 rounded-md" 
-                        data-service-id="<?php echo $service['service_id']; ?>"
-                        data-date-added="<?php echo $service['date_added']; ?>"
-                        data-service-name="<?php echo $service['service_name']; ?>"
-                        data-description="<?php echo $service['description']; ?>">
-                    <img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon">
-                </button>
-                <button id="delete_btn" class="bg-[#EB6B23] hover:bg-[#AE501C] py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/delete.png" alt="viewicon"></button>
+                <td class="py-3">
+                  <button class="overview-btn bg-green-500 hover:bg-green-600 py-2 px-2 rounded-md" 
+                          data-date-added="<?php echo $service['date_added']; ?>"
+                          data-service-name="<?php echo $service['service_name']; ?>"
+                          data-description="<?php echo $service['description']; ?>">
+                      <img class="h-5" src="/susers/asset/icons/view.png" alt="viewicon">
+                  </button>
+                  <button id="delete_btn" class="bg-orange-500 hover:bg-orange-600 py-2 px-2 rounded-md"><img class="h-5" src="/susers/asset/icons/delete.png" alt="viewicon"></button>
                </td>
             </tr>
             <tr>
@@ -244,7 +299,6 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <!-- Modal body -->
             <div class="p-4 md:p-5 space-y-1 font-semibold text-base text-gray-600">
-                <p>Service Number: <span class="font-medium" id="modal-service-id"></span></p>
                 <p>Date Added: <span class="font-medium" id="modal-date-added"></span></p>
                 <p>Service Name: <span class="font-medium" id="modal-service-name"></span></p>
                 <p>Description: <span class="font-medium" id="modal-description"></span></p>
@@ -252,7 +306,6 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </div>
-
 <!--Add Service-->
 <div id="add-service" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full max-w-lg max-h-full">
@@ -303,17 +356,17 @@ $services = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
-<div id="confirmation" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-gray-800 h-screen" role="alert">
+<div id="confirmation" class="hidden fixed top-0 left-0 right-0 z-50 items-center justify-center p-4 mb-4 text-base text-gray-600 h-screen" role="alert">
    <div class="flex justify-center">
-      <div class=" flex justify-center w-fit bg-white px-5 py-5 rounded-md shadow-md">
+      <div class="flex justify-center w-fit bg-white px-5 py-5 rounded-md shadow-2xl text-orange-500">
                <svg class="flex-shrink-0 inline w-6 h-6 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                </svg>
            <div>
                <span id="confirm-message" class="font-medium"></span>
                <div class="mt-4 flex justify-end">
-                  <button id="alert-submit" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded me-2">Confirm</button>
-                  <button id="alert-cancel" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Cancel</button>
+                  <button id="alert-submit" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded me-2">Confirm</button>
+                  <button id="alert-cancel" class="text-gray-800 bg-gray-100 hover:bg-gray-300 px-4 py-2 rounded">Cancel</button>
                </div>
            </div>
       </div>

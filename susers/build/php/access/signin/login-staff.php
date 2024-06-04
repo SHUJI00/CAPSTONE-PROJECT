@@ -60,7 +60,14 @@ if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
 </head>
 <body class="bg-[#F9FAFB] font-sans flex flex-col md:flex-row items-center h-screen md:justify-evenly">
 
-<img class="md:h-1/4 h-40" src="/susers/asset/img/workflowpro.png" alt="_logo">
+    <div class="flex flex-row gap-2 items-center">
+        <img src="/susers/asset/img/colored-logo.png" alt="woms-logo">
+        <div>
+            <h1 class="text-5xl w-80 font-semibold text-green-600">DAVAO DEL NORTE STATE COLLEGE</h1>
+            <p class="text-lg text-white px-3 rounded-md font-semibold bg-green-600 w-fit">Work Order Management System</p>
+        </div>
+    </div>
+
 <form class="md:w-auto w-2/3 px-8 py-7 rounded-md shadow-md bg-[#ffff] flex flex-col gap-4" method="post">
 
 <div class="flex flex-row justify-between items-center">

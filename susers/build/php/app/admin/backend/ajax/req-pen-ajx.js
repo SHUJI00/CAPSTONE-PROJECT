@@ -188,6 +188,41 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     });
 
+    const searchInput = document.getElementById('default-search');
+    const searchByDropdown = document.getElementById('search-by');
+    const tableRows = document.querySelectorAll('tbody tr');
+
+    searchInput.addEventListener('input', filterTable);
+    searchByDropdown.addEventListener('change', filterTable);
+
+    function filterTable() {
+        const searchValue = searchInput.value.trim().toLowerCase();
+        const searchBy = searchByDropdown.value;
+    
+        tableRows.forEach(row => {
+            let textContent = '';
+    
+            if (searchBy === 'requested-by') {
+                const requestedByCell = row.querySelector('td:nth-child(4)');
+                if (requestedByCell) {
+                    textContent = requestedByCell.textContent.trim().toLowerCase();
+                }
+            } else if (searchBy === 'services') {
+                const servicesCell = row.querySelector('td:nth-child(2)');
+                if (servicesCell) {
+                    textContent = servicesCell.textContent.trim().toLowerCase();
+                }
+            }
+    
+            if (textContent.includes(searchValue)) {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+
     overviewButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             const details = {

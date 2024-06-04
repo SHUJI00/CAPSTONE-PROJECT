@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showAlert('User accepted successfully.', true);
+                    showAlert('User has been accepted.', true);
                     setTimeout(function() {
                         window.location.reload();
                     }, 3000);
@@ -41,7 +41,35 @@ document.addEventListener('DOMContentLoaded', (event) => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showAlert('User revoked successfully.', true);
+                    showAlert('User has been revoked.', true);
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    showAlert('An error occurred: ' + data.message, false);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+
+    document.querySelectorAll('#decline_btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const username = row.querySelector('td:nth-child(3)').innerText;
+            const usertype = row.querySelector('td:nth-child(4)').innerText;
+            
+            fetch('/susers/build/php/app/admin/backend/decline-account.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: username, usertype: usertype }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('User has been decline.', true);
                     setTimeout(function() {
                         window.location.reload();
                     }, 3000);

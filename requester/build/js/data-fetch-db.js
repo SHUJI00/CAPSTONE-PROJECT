@@ -44,16 +44,24 @@ $(document).ready(function() {
                 valid = false;
             }
         }
+        if(valid){
+            const timeValue = $('#time').val(); // Assuming you are using jQuery to get the input value
 
-        // Validate the time field for 12:00 AM
-        if (valid) {
-            const timeValue = $('#time').val();
-            if (timeValue === '00:00') {
-                showModal(validate, messageElement, 'Time cannot be 12:00 AM.');
-                valid = false;
+            const startTime = new Date();
+            startTime.setHours(7, 0, 0); // Set start time to 7:00 AM
+        
+            const endTime = new Date();
+            endTime.setHours(17, 0, 0); // Set end time to 5:00 PM
+        
+            const parts = timeValue.split(':');
+            const inputTime = new Date();
+            inputTime.setHours(parseInt(parts[0]), parseInt(parts[1]), 0, 0);
+        
+            if (inputTime < startTime || inputTime > endTime) {
+                showModal(validate, messageElement, 'Select time range 7:00 AM to 5:00 PM.');
+                 valid = false;
             }
         }
-        // If all validations pass, show the request details modal
         if (valid) {
             let details = '';
             $.each(formFields, function(id, name) {

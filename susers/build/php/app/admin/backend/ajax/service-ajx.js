@@ -40,63 +40,11 @@ $(document).ready(function() {
                 showAlert('An error occurred while updating the data. Status: ' + status + ', Error: ' + error, false);
             }
         });
-
-        document.querySelectorAll('#delete_btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const row = this.closest('tr');
-                const username = row.querySelector('td:nth-child(1)').innerText;
-    
-                fetch('/susers/build/php/app/admin/backend/accept_user.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username: username }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showAlert('User accepted successfully.', true);
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 3000);
-                    } else {
-                        showAlert('An error occurred: ' + data.message, false);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
     });
-    
-    // Show alert function
-function showAlert(message, success = false) {
-    const alertMessage = document.getElementById('alert-message');
-    const alert = document.getElementById('alert');
-    alertMessage.textContent = message;
-    if (success) {
-        alert.classList.remove('text-yellow-800', 'bg-yellow-50');
-        alert.classList.add('success');
-    } else {
-        alert.classList.add('text-yellow-800', 'bg-yellow-50');
-        alert.classList.remove('success');
-    }
-    alert.classList.remove('hidden');
-    setTimeout(function() {
-        alert.classList.add('show');
-    }, 10);
-    setTimeout(function() {
-        alert.classList.remove('show');
-        setTimeout(function() {
-            alert.classList.add('hidden');
-        }, 500);
-    }, 3500);
-}
 });
 document.addEventListener('DOMContentLoaded', (event) => {
     const overviewButtons = document.querySelectorAll('.overview-btn');
     const modal = document.getElementById('overview-modal');
-    const modalServiceId = document.getElementById('modal-service-id');
     const modalDateAdded = document.getElementById('modal-date-added');
     const modalServiceName = document.getElementById('modal-service-name');
     const modalDescription = document.getElementById('modal-description');
@@ -104,12 +52,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
     overviewButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            const serviceId = button.getAttribute('data-service-id');
             const dateAdded = button.getAttribute('data-date-added');
             const serviceName = button.getAttribute('data-service-name');
             const description = button.getAttribute('data-description');
 
-            modalServiceId.textContent = serviceId;
             modalDateAdded.textContent = dateAdded;
             modalServiceName.textContent = serviceName;
             modalDescription.textContent = description;
@@ -121,4 +67,69 @@ document.addEventListener('DOMContentLoaded', (event) => {
     modalCloseBtn.addEventListener('click', () => {
         modal.classList.add('hidden');
     });
+
+    document.querySelectorAll('#delete_btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const row = this.closest('tr');
+            const sid = row.querySelector('td:nth-child(1)').innerText;
+            $('#confirm-message').text("Are you sure you want to delete this service?");
+            $('#confirmation').css('display', 'flex');
+            setTimeout(() => $('#confirmation').addClass('show'), 10);
+
+            $('#alert-submit').off('click').on('click', function() {
+                $('#confirmation').removeClass('show');
+                setTimeout(() => $('#confirmation').css('display', 'none'), 300);
+            // console.log(sid);
+            fetch('/susers/build/php/app/admin/backend/delete-service.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ sid: sid }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('Service delete successfully.', true);
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    showAlert('An error occurred: ' + data.message, false);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+    });
+
+    // Handle Cancel button click
+    $('#alert-cancel').off('click').on('click', function() {
+        $('#confirmation').removeClass('show');
+        setTimeout(() => $('#confirmation').css('display', 'none'), 300);
+        showAlert("Deleting the service has been cancelled.");
+    });
 });
+    // Show alert function
+    function showAlert(message, success = false) {
+        const alertMessage = document.getElementById('alert-message');
+        const alert = document.getElementById('alert');
+        alertMessage.textContent = message;
+        if (success) {
+            alert.classList.remove('text-yellow-800', 'bg-yellow-50');
+            alert.classList.add('success');
+        } else {
+            alert.classList.add('text-yellow-800', 'bg-yellow-50');
+            alert.classList.remove('success');
+        }
+        alert.classList.remove('hidden');
+        setTimeout(function() {
+            alert.classList.add('show');
+        }, 10);
+        setTimeout(function() {
+            alert.classList.remove('show');
+            setTimeout(function() {
+                alert.classList.add('hidden');
+            }, 500);
+        }, 3500);
+    }

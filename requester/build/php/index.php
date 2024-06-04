@@ -10,6 +10,21 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="/requester/build/js/control-no.js"></script>
     <script src="/requester/build/js/data-fetch-db.js"></script>
+    <style>
+                /* Style to make past dates grayed out */
+        input[type="date"] {
+            color: black; /* Change text color */
+        }
+        input[type="date"]::-webkit-inner-spin-button {
+            display: none; /* Hide arrow */
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            opacity: 1; /* Make calendar icon visible */
+        }
+        input[type="date"][disabled] {
+            color: gray; /* Gray out text */
+        }
+    </style>
 </head>
 <body class="font-sans flex justify-center items-center">
     <!-- main content -->
@@ -93,26 +108,28 @@
 </div>
 
             <!--Date And Time Needed-->
-            <h1 class="text-white mb-2 bg-[#47BC8D] p-1.5">Date And Time Service Need</h1>
-                <div class="mb-2 max-w grid grid-rows-2 grid-flow-col gap-4 md:flex md:flex-row md:flex-grow">
+        <h1 class="text-white mb-2 bg-[#47BC8D] p-1.5">Date And Time Service Need</h1>
+            <div class="mb-2 max-w grid grid-rows-2 grid-flow-col gap-4 md:flex md:flex-row md:flex-grow">
                     <!--Date needed -->
                     <div class="flex flex-col">
                         <label for="date">Date: </label>
-                        <div class="relative max-w-sm">
-                            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                                <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-                                </svg>
-                            </div>
-                            <input datepicker datepicker-buttons datepicker-autoselect-today type="text" id="date" name="start" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full ps-10 p-2.5" placeholder="Date service needed">
-                        </div>
+                        <input class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" type="date" id="date" min="" onchange="setMinDate()">
                     </div>
+                    <script>
+                function setMinDate() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById("date").setAttribute("min", today);
+        }
+        setMinDate(); // Set initial minimum date
+    </script>
                     <!--Time needed-->
                     <div class="flex flex-col">
                         <label for="time">Time: </label>
                         <input type="time" id="time" class="bg-gray-50 border leading-none border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-green-500 focus:border-green-500 block w-full p-2.5" min="09:00" max="18:00" value="00:00"/>
                     </div>
                 </div>
+
+
             <!--Purpose Info -->
             <h1 class="text-white mb-2 bg-[#47BC8D] p-1.5">Purpose/Description of Request</h1>
             <div class="flex flex-col border-2 flex-grow mb-2">
@@ -189,6 +206,7 @@
         </div>
     </div>
 </div>
+
 </body>
 <script src="/requester/build/js/service-fetch.js"></script>
 <script src="/requester/node_modules/flowbite/dist/flowbite.min.js"></script>
