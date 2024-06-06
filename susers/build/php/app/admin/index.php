@@ -68,7 +68,6 @@ if ($_SESSION['user_type'] !== 'admin') {
   
   <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-5 transition-transform -translate-x-full bg-green-700 md:translate-x-0 drop-shadow-2xl shadow-slate-800 rounded-r-xl" aria-label="Sidebar">
    <a href="/susers/build/php/app/admin/index.php" class="flex md:me-24 mb-5 justify-center w-full">
-      
    <div class="flex flex-col gap-2 items-center text-center justify-center">
         <img class="h-6" src="/susers/asset/img/colored-logo.png" alt="woms-logo">
         <div class="text-center flex flex-col items-center">
@@ -76,7 +75,6 @@ if ($_SESSION['user_type'] !== 'admin') {
             <p class=" text-xs text-white px-3 py-2 rounded-md font-semibold bg-green-500 w-fit">Work Order Management System</p>
         </div>
     </div>
-
     </a>
      <div class="h-full px-3 pb-4 overflow-y-auto bg-green-700">
         <ul class="space-y-2 font-medium">

@@ -1,3 +1,15 @@
+<?php 
+session_start();
+include 'config.php';
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
+if ($_SESSION['user_type'] !== 'admin') {
+   header("Location: /susers/build/php/access/signin/login-admin.php");
+   exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,7 +44,7 @@
               <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow" id="dropdown-user">
                 <div class="px-4 py-3" role="none">
                   <p class="text-sm text-gray-900" role="none">
-                    Engr. Noel Herira E. Sanches
+                  <?php echo $_SESSION['user']['fname'].' '.$_SESSION['user']['lname']; ?>
                   </p>
                   <p class="text-sm font-medium text-gray-900 truncate" role="none">
                     Administrator
@@ -43,7 +55,7 @@
                     <a href="/susers/build/php/app/admin/profile.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Profile</a>
                   </li>
                   <li>
-                    <a href="/susers/build/php/access/signin/login-admin.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
+                    <a href="/susers/build/php/app/admin/logout.php" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Sign out</a>
                   </li>
                 </ul>
               </div>
@@ -137,13 +149,13 @@
 
       <div class="h-24 w-24 bg-gray-300 rounded-full text-gray-500 text-center pt-9">No Image</div>
       <h1 class="text-xl my-2 font-medium text-gray-600">Personal Information</h1>
-      <p class="text-gray-600"><b>First Name:</b></p>
-      <p class="text-gray-600"><b>Last Name:</b></p>
-      <p class="text-gray-600"><b>Mobile Number:</b></p>
+      <p class="text-gray-600"><b>First Name: </b><?php echo $_SESSION['user']['fname'];?></p>
+      <p class="text-gray-600"><b>Last Name: </b><?php echo $_SESSION['user']['lname'];?></p>
+      <p class="text-gray-600"><b>Mobile Number: </b><?php echo $_SESSION['user']['mobile_number'];?></p>
       <button data-modal-target="personal-modal" data-modal-toggle="personal-modal" class="bg-green-500 hover:bg-green-600 py-1 px-4 w-20 rounded-md font-medium text-white">Edit</button>
       <h1 class="text-xl my-2 font-medium text-gray-600">Login Information</h1>
-      <p class="text-gray-600"><b>Username:</b></p>
-      <p class="text-gray-600"><b>Password</b></p>
+      <p class="text-gray-600"><b>Username: </b><?php echo $_SESSION['user']['username'];?></p>
+      <p class="text-gray-600"><b>Password: </b>************</p>
       <button data-modal-target="login-modal" data-modal-toggle="login-modal" class="bg-green-500 hover:bg-green-600 py-1 px-4 w-20 rounded-md font-medium text-white">Edit</button>
 
 
@@ -164,26 +176,43 @@
                      <span class="sr-only">Close modal</span>
                  </button>
              </div>
-             <!-- Modal body -->
-             <form class="p-4 md:p-5">
-                 <div class="grid gap-4 mb-4 grid-cols-2">
-                     <div class="col-span-2">
-                         <label for="firstname" class="block mb-2 text-sm font-medium text-gray-900">First Name</label>
-                         <input type="text" name="firstname" id="firstname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Enter your First Name" required="">
-                     </div>
-                     <div class="col-span-2">
-                        <label for="lastname" class="block mb-2 text-sm font-medium text-gray-900">Last Name</label>
-                        <input type="text" name="lastname" id="lastname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Enter yur Last Name" required="">
-                     </div>
-                     <div class="col-span-2">
-                        <label for="mobilenum" class="block mb-2 text-sm font-medium text-gray-900">Mobile Number</label>
-                        <input type="text" name="mobilenum" id="mobilenum" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" required="">
-                     </div>
-                 </div>
-                 <button type="submit" class="text-white inline-flex items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                     Update
-                 </button>
-             </form>
+<?php
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    
+    // Retrieve form data
+    $logid = $_SESSION['user']['login_id'];
+    $fname = $_POST['firstname'];
+    $lname = $_POST['lastname'];
+    $mobnum = $_POST['mobilenum'];
+
+    // Prepare and execute the update query
+    $stmt = $pdo->prepare("UPDATE admin_acc SET fname=?, lname=?, mobile_number=? WHERE login_id=?");
+    $stmt->execute([$fname, $lname, $mobnum, $logid]);
+    header("Location: /susers/build/php/app/admin/logout.php");
+}
+?>
+
+<!-- HTML Form -->
+<form action="" method="post" class="p-4 md:p-5">
+    <div class="grid gap-4 mb-4 grid-cols-2">
+        <div class="col-span-2">
+            <label for="firstname" class="block mb-2 text-sm font-medium text-gray-900">First Name</label>
+            <input type="text" name="firstname" id="firstname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Enter your First Name" required="">
+        </div>
+        <div class="col-span-2">
+            <label for="lastname" class="block mb-2 text-sm font-medium text-gray-900">Last Name</label>
+            <input type="text" name="lastname" id="lastname" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" placeholder="Enter your Last Name" required="">
+        </div>
+        <div class="col-span-2">
+            <label for="mobilenum" class="block mb-2 text-sm font-medium text-gray-900">Mobile Number</label>
+            <input type="text" name="mobilenum" id="mobilenum" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5" required="">
+        </div>
+    </div>
+    <button type="submit" class="text-white inline-flex items-center bg-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+        Update
+    </button>
+</form>
+
          </div>
      </div>
  </div>
@@ -196,6 +225,7 @@
                  <h3 class="text-lg font-semibold text-gray-900">
                      Login Information
                  </h3>
+                 <p class="text-sm text-gray-600">(after clicking the submit button the system will automatically logout to reload the session)</p>
                  <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-toggle="login-modal">
                      <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
                          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
