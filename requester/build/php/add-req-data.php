@@ -5,7 +5,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $reqcontrolnum = filter_var($_POST['req-con-no'], FILTER_SANITIZE_STRING);
     $fname = filter_var($_POST['fname'], FILTER_SANITIZE_STRING);
     $lname = filter_var($_POST['lname'], FILTER_SANITIZE_STRING);
-    $contactinfo = filter_var($_POST['contactinfo'], FILTER_SANITIZE_STRING);
+    $contactinfo = filter_var($_POST['email'], FILTER_SANITIZE_STRING);
     $deprt = filter_var($_POST['department'], FILTER_SANITIZE_STRING);
     $services = filter_var($_POST['service'], FILTER_SANITIZE_STRING);
     $purpose = filter_var($_POST['des-req'], FILTER_SANITIZE_STRING);

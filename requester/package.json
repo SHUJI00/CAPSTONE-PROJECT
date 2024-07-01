@@ -98,8 +98,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build":"tailwindcss -i ./build/css/input.css -o ./build/css/output.css --watch",
-    "trial":"tailwindcss -i ./build/css/input.css -o ./build/css/output.css"
+    "build": "tailwindcss -i ./build/css/input.css -o ./build/css/output.css --watch",
+    "trial": "tailwindcss -i ./build/css/input.css -o ./build/css/output.css"
   },
   "keywords": [],
   "author": "",
